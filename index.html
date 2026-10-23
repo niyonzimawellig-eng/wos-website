@@ -33,10 +33,10 @@
         .price-badge { background: #f0fdf4; color: #166534; padding: 6px 12px; border-radius: 20px; font-weight: bold; display: inline-block; font-size: 14px; margin: 5px auto; }
         
         .btn-action { background: #2563eb; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s ease; }
-        .btn-action:hover { background: #1d4ed8; }
+        .btn-action:hover { background: #1d4ed8; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
 
         .side-panel { display: flex; flex-direction: column; gap: 30px; }
-        .panel-box { background: white; padding: 26px; border-radius: 14px; border: 1px solid #e2e8f0; }
+        .panel-box { background: white; padding: 26px; border-radius: 14px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
         .panel-box h3 { font-size: 18px; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; font-weight: 700; }
         
         .input-field { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin: 8px 0; font-size: 14px; box-sizing: border-box; background-color: #f8fafc; }
@@ -66,7 +66,7 @@
         <main class="content-area">
             <div class="welcome-hero">
                 <h2>Murakaza neza kuri WELLIG ONLINE SERVICES</h2>
-                <p>Abakiriya bashobora guhitamo serivisi, bakazuza amakuru yabo ako kanya.</p>
+                <p>Abakiriya bashobora guhitamo serivisi, bakazuza amakuru yabo ako kanya binyuze kuri internet.</p>
             </div>
 
             <div class="services-section">
@@ -106,11 +106,11 @@
         </main>
     </div>
 
-    <!-- Guhamagara Supabase SDK -->
+    <!-- Guhamagara Supabase SDK nshya -->
     <script src="https://jsdelivr.net"></script>
     <script>
         const SUPABASE_URL = "https://supabase.co";
-        // Urufunguzo rwawe nyakuri namaze kuruhambiriza hano neza:
+        // Hano namaze gushyiraho urufunguzo rwawe nyakuri rushya rwose neza:
         const SUPABASE_ANON_KEY = "sb_publishable_TSwcw-78UIDtLLI4FhI_HQ_fTJUPZ1o"; 
         
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -129,7 +129,7 @@
                     
                     <div class="form-group">
                         <label>Amazina (Full Name)</label>
-                        <input type="text" id="client_name" class="input-field" placeholder="Urugero: Niyonzima Wellars">
+                        <input type="text" id="client_name" class="input-field" placeholder="Urugero: Keza Alice">
                     </div>
                     
                     <div class="form-group">
@@ -151,7 +151,7 @@
                 return;
             }
 
-            // Kohereza amakuru muri meza ya submissions nk'uko wayiremye muri Supabase
+            // Gushyira amakuru muri meza bihuje neza n'ibikuri Supabase yawe
             const { data, error } = await supabase
                 .from('submissions')
                 .insert([
@@ -162,10 +162,10 @@
                 ]);
 
             if (error) {
-                console.error("Ikibazo cyabonetse:", error);
+                console.error("Ikibazo:", error);
                 alert("Ntabwo byagiye muri database. Genzura neza!");
             } else {
-                alert("Yego! Application ya " + izina + " yo kuri " + serivisiYahitwemo + " yoherejwe neza muri Database yawe!");
+                alert("Yego! Application yoherejwe neza. Admin ahita ayibona muri Supabase!");
                 hitamoSerivisi(serivisiYahitwemo, igiciroKwishyura);
             }
         }
