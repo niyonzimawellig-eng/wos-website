@@ -5,40 +5,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WOS - Wellig Online Services</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: #f0f2f5; display: flex; flex-direction: column; min-height: 100vh; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        body { background-color: #f8fafc; display: flex; flex-direction: column; min-height: 100vh; color: #1e293b; }
         
-        header { background-color: #0056b3; color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
-        .logo-area { display: flex; align-items: center; gap: 10px; }
-        .logo-box { background: white; color: #0056b3; padding: 5px 10px; font-weight: bold; border-radius: 4px; font-size: 20px; }
-        
+        header { background: linear-gradient(135deg, #0f172a, #1e3a8a); color: white; padding: 18px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .logo-area { display: flex; align-items: center; gap: 14px; }
+        .logo-box { background: #38bdf8; color: #0f172a; padding: 6px 14px; font-weight: 800; border-radius: 8px; font-size: 22px; letter-spacing: 1px; }
+        .logo-area h2 { font-size: 20px; font-weight: 700; letter-spacing: 0.5px; }
+        .admin-badge { background-color: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 6px 16px; border-radius: 30px; font-size: 13px; font-weight: 600; border: 1px solid rgba(56, 189, 248, 0.3); }
+
         .main-wrapper { display: flex; flex: 1; }
         
-        sidebar { width: 240px; background-color: #1e293b; color: #cbd5e1; padding: 20px 10px; display: flex; flex-direction: column; gap: 10px; }
-        sidebar a { color: #cbd5e1; text-decoration: none; padding: 12px 15px; border-radius: 6px; display: block; font-size: 15px; transition: 0.2s; }
-        sidebar a.active, sidebar a:hover { background-color: #0284c7; color: white; }
+        sidebar { width: 260px; background-color: #0f172a; padding: 30px 16px; display: flex; flex-direction: column; gap: 8px; border-right: 1px solid #1e293b; }
+        sidebar a { color: #94a3b8; text-decoration: none; padding: 14px 18px; border-radius: 8px; display: flex; align-items: center; gap: 12px; font-size: 15px; font-weight: 500; transition: all 0.2s ease; }
+        sidebar a.active, sidebar a:hover { background-color: #1e3a8a; color: #f8fafc; transform: translateX(4px); }
 
-        .content-area { flex: 1; padding: 30px; display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
+        .content-area { flex: 1; padding: 40px; display: grid; grid-template-columns: 2fr 1fr; gap: 35px; }
         
-        .welcome-hero { background: linear-gradient(135deg, #1e40af, #0369a1); color: white; padding: 30px; border-radius: 12px; grid-column: 1 / -1; }
-        .welcome-hero h2 { color: #fbcfe8; font-size: 28px; margin-bottom: 8px; }
+        .welcome-hero { background: linear-gradient(135deg, #1e3a8a, #0284c7); color: white; padding: 35px; border-radius: 16px; grid-column: 1 / -1; box-shadow: 0 10px 25px rgba(30, 58, 138, 0.15); position: relative; overflow: hidden; }
+        .welcome-hero h2 { font-size: 30px; font-weight: 700; margin-bottom: 10px; color: #f0fdf4; }
+        .welcome-hero p { color: #e0f2fe; font-size: 16px; max-width: 600px; line-height: 1.5; }
 
-        .services-section h3 { margin-bottom: 20px; color: #1e293b; font-size: 20px; }
-        .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
-        .card h4 { color: #1e3a8a; font-size: 16px; }
+        .services-section h3 { margin-bottom: 24px; color: #0f172a; font-size: 22px; font-weight: 700; }
+        .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
+        .card { background: white; padding: 20px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
+        .card h4 { color: #1e3a8a; font-size: 16px; font-weight: 700; }
         .price-badge { background: #f0fdf4; color: #166534; padding: 6px 12px; border-radius: 20px; font-weight: bold; display: inline-block; font-size: 14px; margin: 5px auto; }
         
-        .btn-action { background: #0284c7; color: white; border: none; padding: 10px; border-radius: 6px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.2s; }
-        .btn-action:hover { background: #0369a1; }
+        .btn-action { background: #2563eb; color: white; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; transition: all 0.2s ease; }
+        .btn-action:hover { background: #1d4ed8; }
 
-        .side-panel { display: flex; flex-direction: column; gap: 25px; }
-        .panel-box { background: white; padding: 20px; border-radius: 10px; border: 1px solid #e2e8f0; }
-        .panel-box h3 { font-size: 16px; color: #334155; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
+        .side-panel { display: flex; flex-direction: column; gap: 30px; }
+        .panel-box { background: white; padding: 26px; border-radius: 14px; border: 1px solid #e2e8f0; }
+        .panel-box h3 { font-size: 18px; color: #0f172a; margin-bottom: 20px; border-bottom: 2px solid #f1f5f9; padding-bottom: 12px; font-weight: 700; }
         
-        .input-field { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; margin: 8px 0; font-size: 14px; box-sizing: border-box; }
-        .form-group { text-align: left; margin-bottom: 10px; }
-        .form-group label { font-size: 13px; font-weight: bold; color: #475569; }
+        .input-field { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin: 8px 0; font-size: 14px; box-sizing: border-box; background-color: #f8fafc; }
+        .form-group { text-align: left; margin-bottom: 14px; }
+        .form-group label { font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px; }
     </style>
 </head>
 <body>
@@ -49,7 +52,7 @@
             <h2>WELLIG ONLINE SERVICES</h2>
         </div>
         <div>
-            <span style="font-weight: bold;">ADMIN PORTAL</span>
+            <span class="admin-badge">ADMIN PORTAL</span>
         </div>
     </header>
 
@@ -96,15 +99,22 @@
                 <div class="panel-box">
                     <h3>Fomu yo Guza Application</h3>
                     <div id="form-container">
-                        <p style="color: #64748b; font-size: 14px; text-align: center;">Banza uhitemo serivisi ibumoso...</p>
+                        <p style="color: #64748b; font-size: 14px; text-align: center; padding: 20px 0;">Banza uhitemo serivisi ibumoso...</p>
                     </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Hano hakoreshejwe porogaramu ihamagara ifomu idasaba Supabase keys zizunguruka -->
+    <!-- Guhamagara Supabase SDK -->
+    <script src="https://jsdelivr.net"></script>
     <script>
+        const SUPABASE_URL = "https://supabase.co";
+        // Urufunguzo rwawe nyakuri namaze kuruhambiriza hano neza:
+        const SUPABASE_ANON_KEY = "sb_publishable_TSwcw-78UIDtLLI4FhI_HQ_fTJUPZ1o"; 
+        
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         let serivisiYahitwemo = "";
         let igiciroKwishyura = 0;
 
@@ -112,15 +122,14 @@
             serivisiYahitwemo = izina;
             igiciroKwishyura = igiciro;
             
-            // Fomu ihita ifunguka neza nta nkomyi
             document.getElementById('form-container').innerHTML = `
-                <div style="background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
-                    <p style="font-weight: bold; color: #0f172a; margin-bottom: 10px;">Serivisi: ${izina}</p>
-                    <p style="font-weight: bold; color: #16a34a; margin-bottom: 15px;">Igiciro: ${igiciro} RWF</p>
+                <div style="background: #ffffff; padding: 5px; border-radius: 8px;">
+                    <p style="font-weight: 700; color: #1e3a8a; margin-bottom: 4px;">Serivisi: ${izina}</p>
+                    <p style="font-weight: 700; color: #16a34a; margin-bottom: 15px;">Igiciro: ${igiciro} RWF</p>
                     
                     <div class="form-group">
                         <label>Amazina (Full Name)</label>
-                        <input type="text" id="client_name" class="input-field" placeholder="Urugero: Keza Alice">
+                        <input type="text" id="client_name" class="input-field" placeholder="Urugero: Niyonzima Wellars">
                     </div>
                     
                     <div class="form-group">
@@ -133,7 +142,7 @@
             `;
         }
 
-        function oherezaApplicationMuriDatabase() {
+        async function oherezaApplicationMuriDatabase() {
             let izina = document.getElementById('client_name').value;
             let phone = document.getElementById('client_phone').value;
 
@@ -142,8 +151,23 @@
                 return;
             }
 
-            alert("Yego! Application ya " + izina + " yo kuri " + serivisiYahitwemo + " yoherejwe neza!");
-            hitamoSerivisi(serivisiYahitwemo, igiciroKwishyura);
+            // Kohereza amakuru muri meza ya submissions nk'uko wayiremye muri Supabase
+            const { data, error } = await supabase
+                .from('submissions')
+                .insert([
+                    { 
+                        tatus: "New",
+                        "client names": izina
+                    }
+                ]);
+
+            if (error) {
+                console.error("Ikibazo cyabonetse:", error);
+                alert("Ntabwo byagiye muri database. Genzura neza!");
+            } else {
+                alert("Yego! Application ya " + izina + " yo kuri " + serivisiYahitwemo + " yoherejwe neza muri Database yawe!");
+                hitamoSerivisi(serivisiYahitwemo, igiciroKwishyura);
+            }
         }
     </script>
 </body>
