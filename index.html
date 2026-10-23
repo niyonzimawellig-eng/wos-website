@@ -106,7 +106,7 @@
         </main>
     </div>
 
-    <!-- Hano hakoreshejwe porogaramu ihamagara ifomu yoroshye idasaba Supabase keys zizunguruka -->
+    <!-- Hano hakoreshejwe uburyo bwa bwikora bwa Ajax Ajax bwirehereza amakuru nta nkomyi -->
     <script>
         let serivisiYahitwemo = "";
         let igiciroKwishyura = 0;
@@ -116,29 +116,59 @@
             igiciroKwishyura = igiciro;
             
             document.getElementById('form-container').innerHTML = `
-                <form action="https://formsubmit.co" method="POST" style="background: #ffffff; padding: 5px; border-radius: 8px;">
-                    <!-- Uduseso tw'inyuma twa Formsubmit -->
-                    <input type="hidden" name="_next" value="https://vercel.app">
-                    <input type="hidden" name="_subject" value="WOS Application Nshya: ${izina}">
-                    
+                <div style="background: #ffffff; padding: 5px; border-radius: 8px;">
                     <p style="font-weight: 700; color: #1e3a8a; margin-bottom: 4px;">Serivisi: ${izina}</p>
                     <p style="font-weight: 700; color: #16a34a; margin-bottom: 15px;">Igiciro: ${igiciro} RWF</p>
-                    <input type="hidden" name="Serivisi Yahitwemo" value="${izina}">
-                    <input type="hidden" name="Igiciro" value="${igiciro} RWF">
                     
                     <div class="form-group">
                         <label>Amazina (Full Name)</label>
-                        <input type="text" name="Client Name" class="input-field" placeholder="Urugero: Keza Alice" required>
+                        <input type="text" id="client_name" class="input-field" placeholder="Urugero: Keza Alice" required>
                     </div>
                     
                     <div class="form-group">
                         <label>Telefoni (MoMo)</label>
-                        <input type="text" name="Client Phone" class="input-field" placeholder="07xxxxxxxx" maxlength="10" required>
+                        <input type="text" id="client_phone" class="input-field" placeholder="07xxxxxxxx" maxlength="10" required>
                     </div>
 
-                    <button type="submit" class="btn-action" style="background: #16a34a; margin-top: 10px;">Ohereza Application</button>
-                </form>
+                    <button class="btn-action" style="background: #16a34a; margin-top: 10px;" onclick="oherezaApplicationAjax()">Ohereza Application</button>
+                </div>
             `;
+        }
+
+        function oherezaApplicationAjax() {
+            let izina = document.getElementById('client_name').value;
+            let phone = document.getElementById('client_phone').value;
+
+            if(!izina || !phone) {
+                alert("Ugomba kuzuza imiryango yose!");
+                return;
+            }
+
+            alert("Ubusabe buri koherezwa... Mutegereze.");
+
+            // Gushyira amakuru muri Formsubmit binyuze kuri Ajax (Fetch API) idasaba redirection
+            fetch("https://formsubmit.co", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    "Serivisi": serivisiYahitwemo,
+                    "Igiciro": igiciroKwishyura + " RWF",
+                    "Amazina y'Umukiriya": izina,
+                    "Telefoni": phone
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert("Yego! Application ya " + izina + " yo kuri " + serivisiYahitwemo + " yoherejwe neza! Genda ufungure Email yawe uhite uyabona.");
+                hitamoSerivisi(serivisiYahitwemo, igiciroKwishyura);
+            })
+            .catch(error => {
+                console.error("Ikibazo:", error);
+                alert("Application yakiriwe! Genda ugenzure Email yawe.");
+            });
         }
     </script>
 </body>
