@@ -28,7 +28,7 @@
 
         .services-section h3 { margin-bottom: 24px; color: #0f172a; font-size: 22px; font-weight: 700; }
         .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
-        .card { background: white; padding: 20px; border-radius: 14px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
+        .card { background: white; padding: 20px; border-radius: 14px; border: 1px solid #e2e8f0; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; }
         .card h4 { color: #1e3a8a; font-size: 16px; font-weight: 700; }
         .price-badge { background: #f0fdf4; color: #166534; padding: 6px 12px; border-radius: 20px; font-weight: bold; display: inline-block; font-size: 14px; margin: 5px auto; }
         
@@ -106,15 +106,8 @@
         </main>
     </div>
 
-    <!-- Guhamagara Supabase SDK nshya -->
-    <script src="https://jsdelivr.net"></script>
+    <!-- Hano hakoreshejwe porogaramu ihamagara ifomu yoroshye idasaba Supabase keys zizunguruka -->
     <script>
-        const SUPABASE_URL = "https://supabase.co";
-        // Hano namaze gushyiraho urufunguzo rwawe nyakuri rushya rwose neza:
-        const SUPABASE_ANON_KEY = "sb_publishable_TSwcw-78UIDtLLI4FhI_HQ_fTJUPZ1o"; 
-        
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
         let serivisiYahitwemo = "";
         let igiciroKwishyura = 0;
 
@@ -123,51 +116,29 @@
             igiciroKwishyura = igiciro;
             
             document.getElementById('form-container').innerHTML = `
-                <div style="background: #ffffff; padding: 5px; border-radius: 8px;">
+                <form action="https://formsubmit.co" method="POST" style="background: #ffffff; padding: 5px; border-radius: 8px;">
+                    <!-- Uduseso tw'inyuma twa Formsubmit -->
+                    <input type="hidden" name="_next" value="https://vercel.app">
+                    <input type="hidden" name="_subject" value="WOS Application Nshya: ${izina}">
+                    
                     <p style="font-weight: 700; color: #1e3a8a; margin-bottom: 4px;">Serivisi: ${izina}</p>
                     <p style="font-weight: 700; color: #16a34a; margin-bottom: 15px;">Igiciro: ${igiciro} RWF</p>
+                    <input type="hidden" name="Serivisi Yahitwemo" value="${izina}">
+                    <input type="hidden" name="Igiciro" value="${igiciro} RWF">
                     
                     <div class="form-group">
                         <label>Amazina (Full Name)</label>
-                        <input type="text" id="client_name" class="input-field" placeholder="Urugero: Keza Alice">
+                        <input type="text" name="Client Name" class="input-field" placeholder="Urugero: Keza Alice" required>
                     </div>
                     
                     <div class="form-group">
                         <label>Telefoni (MoMo)</label>
-                        <input type="text" id="client_phone" class="input-field" placeholder="07xxxxxxxx" maxlength="10">
+                        <input type="text" name="Client Phone" class="input-field" placeholder="07xxxxxxxx" maxlength="10" required>
                     </div>
 
-                    <button class="btn-action" style="background: #16a34a; margin-top: 10px;" onclick="oherezaApplicationMuriDatabase()">Ohereza Application</button>
-                </div>
+                    <button type="submit" class="btn-action" style="background: #16a34a; margin-top: 10px;">Ohereza Application</button>
+                </form>
             `;
-        }
-
-        async function oherezaApplicationMuriDatabase() {
-            let izina = document.getElementById('client_name').value;
-            let phone = document.getElementById('client_phone').value;
-
-            if(!izina || !phone) {
-                alert("Ugomba kuzuza imiryango yose!");
-                return;
-            }
-
-            // Gushyira amakuru muri meza bihuje neza n'ibikuri Supabase yawe
-            const { data, error } = await supabase
-                .from('submissions')
-                .insert([
-                    { 
-                        tatus: "New",
-                        "client names": izina
-                    }
-                ]);
-
-            if (error) {
-                console.error("Ikibazo:", error);
-                alert("Ntabwo byagiye muri database. Genzura neza!");
-            } else {
-                alert("Yego! Application yoherejwe neza. Admin ahita ayibona muri Supabase!");
-                hitamoSerivisi(serivisiYahitwemo, igiciroKwishyura);
-            }
         }
     </script>
 </body>
