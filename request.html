@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="rw">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WOS - Kwiyandikisha & Gusaba Serivisi</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f1f5f9;
+            margin: 0;
+            padding: 0;
+            color: #1e293b;
+        }
+        .form-container {
+            max-width: 550px;
+            margin: 50px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid #0f172a;
+        }
+        h2 { text-align: center; color: #0f172a; margin-top: 0; }
+        p { text-align: center; color: #64748b; font-size: 0.95em; }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 1em;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #eab308;
+        }
+        .btn-submit {
+            background-color: #eab308;
+            color: #0f172a;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1.05em;
+            margin-top: 10px;
+        }
+        .btn-submit:hover { background-color: #ca8a04; }
+        .back-btn {
+            display: block;
+            text-align: center;
+            margin-top: 15px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <h2>Fomu y'Ubusabe (WOS)</h2>
+        <p>Uzuza neza iyi fomu kugira ngo uhabwe serivisi wifuza.</p>
+        
+        <form action="/submit-request" method="POST">
+            <div class="form-group">
+                <label for="name">Amazina Yombi (Full Name):</label>
+                <input type="text" id="name" name="name" required placeholder="Urugero: Niyonzima Wellars">
+            </div>
+
+            <div class="form-group">
+                <label for="phone">Nimero ya Telefone:</label>
+                <input type="tel" id="phone" name="phone" required placeholder="Urugero: 0794055078">
+            </div>
+
+            <div class="form-group">
+                <label for="email">Imeli (Email Address):</label>
+                <input type="email" id="email" name="email" required placeholder="niyonzimawellars533@gmail.com">
+            </div>
+
+            <div class="form-group">
+                <label for="service">Hitamo Serivisi Ushaka:</label>
+                <select id="service" name="service" required>
+                    <option value="">-- Hitamo serivisi --</option>
+                    <option value="irembo">🌐 Irembo Services</option>
+                    <option value="rra">📋 TIN / RRA Assistance</option>
+                    <option value="mutuelle">🏥 Mutuelle Disputes</option>
+                    <option value="jobs">💼 Job Applications</option>
+                    <option value="scholarships">🎓 Scholarship Applications</option>
+                    <option value="cv">📄 CV & Cover Letter</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="details">Amakuru y'inyongera / Ibisobanuro:</label>
+                <textarea id="details" name="details" rows="4" placeholder="Andika hano ibisobanuro bya serivisi ushaka..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit">Bika Ubusabe (Submit Request)</button>
+        </form>
+        
+        <a href="/index.html" class="back-btn">&larr; Subira inyuma</a>
+    </div>
+
+</body>
+</html>
