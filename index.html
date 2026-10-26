@@ -42,6 +42,14 @@
         .input-field { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; margin: 8px 0; font-size: 14px; box-sizing: border-box; background-color: #f8fafc; }
         .form-group { text-align: left; margin-bottom: 14px; }
         .form-group label { font-size: 13px; font-weight: 600; color: #475569; display: block; margin-bottom: 6px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .radio-group { display: flex; gap: 20px; padding: 8px 0; }
+        .radio-group label { display: flex; align-items: center; gap: 6px; font-weight: 500; color: #1e293b; margin: 0; cursor: pointer; }
+        .form-status { font-size: 14px; margin-top: 12px; padding: 10px; border-radius: 8px; display: none; }
+        .form-status.success { display: block; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+        .form-status.error { display: block; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .btn-action:disabled { opacity: 0.6; cursor: not-allowed; }
+        fieldset { border: none; }
     </style>
 </head>
 <body>
@@ -116,59 +124,114 @@
             igiciroKwishyura = igiciro;
             
             document.getElementById('form-container').innerHTML = `
-                <div style="background: #ffffff; padding: 5px; border-radius: 8px;">
+                <form id="application-form" style="background: #ffffff; padding: 5px; border-radius: 8px;">
                     <p style="font-weight: 700; color: #1e3a8a; margin-bottom: 4px;">Serivisi: ${izina}</p>
                     <p style="font-weight: 700; color: #16a34a; margin-bottom: 15px;">Igiciro: ${igiciro} RWF</p>
-                    
+
                     <div class="form-group">
-                        <label>Amazina (Full Name)</label>
-                        <input type="text" id="client_name" class="input-field" placeholder="Urugero: Keza Alice" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Telefoni (MoMo)</label>
-                        <input type="text" id="client_phone" class="input-field" placeholder="07xxxxxxxx" maxlength="10" required>
+                        <label for="full_name">Amazina (Full Name)</label>
+                        <input type="text" id="full_name" name="full_name" class="input-field" placeholder="Urugero: Keza Alice" minlength="2" maxlength="120" autocomplete="name" required>
                     </div>
 
-                    <button class="btn-action" style="background: #16a34a; margin-top: 10px;" onclick="oherezaApplicationAjax()">Ohereza Application</button>
-                </div>
+                    <div class="form-group">
+                        <label for="phone">Telefoni (Phone)</label>
+                        <input type="tel" id="phone" name="phone" class="input-field" placeholder="07xxxxxxxx" pattern="07[0-9]{8}" maxlength="10" autocomplete="tel" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" class="input-field" placeholder="izina@example.com" maxlength="200" autocomplete="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="date_of_birth">Itariki y'amavuko (Date of Birth)</label>
+                        <input type="date" id="date_of_birth" name="date_of_birth" class="input-field" max="${new Date().toISOString().split('T')[0]}" required>
+                    </div>
+
+                    <fieldset class="form-group">
+                        <label>Igitsina (Gender)</label>
+                        <div class="radio-group">
+                            <label><input type="radio" name="gender" value="Male" required> Gabo (Male)</label>
+                            <label><input type="radio" name="gender" value="Female"> Gore (Female)</label>
+                        </div>
+                    </fieldset>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="district">Akarere (District)</label>
+                            <input type="text" id="district" name="district" class="input-field" maxlength="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="sector">Umurenge (Sector)</label>
+                            <input type="text" id="sector" name="sector" class="input-field" maxlength="100" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cell">Akagari (Cell)</label>
+                            <input type="text" id="cell" name="cell" class="input-field" maxlength="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="village">Umudugudu (Village)</label>
+                            <input type="text" id="village" name="village" class="input-field" maxlength="100" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="submit-btn" class="btn-action" style="background: #16a34a; margin-top: 10px;">Ohereza Application</button>
+                    <div id="form-status" class="form-status" role="status" aria-live="polite"></div>
+                </form>
             `;
+
+            document.getElementById('application-form').addEventListener('submit', oherezaApplication);
         }
+    </script>
 
-        function oherezaApplicationAjax() {
-            let izina = document.getElementById('client_name').value;
-            let phone = document.getElementById('client_phone').value;
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = "https://weyqxdmefnnzowovmiap.supabase.co";
+        const SUPABASE_PUBLISHABLE_KEY = "sb_publishable_cGbcUjZn3Sby46kjC4qVSA_t3zHwICp";
+        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
 
-            if(!izina || !phone) {
-                alert("Ugomba kuzuza imiryango yose!");
+        async function oherezaApplication(event) {
+            event.preventDefault();
+            const form = event.target;
+            const status = document.getElementById('form-status');
+            const button = document.getElementById('submit-btn');
+            const data = new FormData(form);
+            const value = (key) => String(data.get(key) || '').trim();
+
+            status.className = 'form-status';
+            button.disabled = true;
+            button.textContent = 'Biri koherezwa...';
+
+            const { error } = await supabaseClient.from('registrations').insert({
+                service: serivisiYahitwemo,
+                price: igiciroKwishyura,
+                full_name: value('full_name'),
+                phone: value('phone'),
+                email: value('email'),
+                date_of_birth: value('date_of_birth'),
+                gender: value('gender'),
+                district: value('district'),
+                sector: value('sector'),
+                cell: value('cell'),
+                village: value('village'),
+            });
+
+            button.disabled = false;
+            button.textContent = 'Ohereza Application';
+
+            if (error) {
+                console.error('Supabase error:', error);
+                status.textContent = 'Habaye ikibazo. Ongera ugerageze.';
+                status.className = 'form-status error';
                 return;
             }
 
-            alert("Ubusabe buri koherezwa... Mutegereze.");
-
-            // Gushyira amakuru muri Formsubmit binyuze kuri Ajax (Fetch API) idasaba redirection
-            fetch("https://formsubmit.co", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    "Serivisi": serivisiYahitwemo,
-                    "Igiciro": igiciroKwishyura + " RWF",
-                    "Amazina y'Umukiriya": izina,
-                    "Telefoni": phone
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                alert("Yego! Application ya " + izina + " yo kuri " + serivisiYahitwemo + " yoherejwe neza! Genda ufungure Email yawe uhite uyabona.");
-                hitamoSerivisi(serivisiYahitwemo, igiciroKwishyura);
-            })
-            .catch(error => {
-                console.error("Ikibazo:", error);
-                alert("Application yakiriwe! Genda ugenzure Email yawe.");
-            });
+            form.reset();
+            status.textContent = `Yego! Application yawe ya ${serivisiYahitwemo} yoherejwe neza.`;
+            status.className = 'form-status success';
         }
     </script>
 </body>
