@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="rw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOS - Wellig Online Services</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+body { background: #f8fafc; min-height: 100vh; color: #1e293b; display: flex; flex-direction: column; }
+.hidden { display: none !important; }
+
+/* Header */
+header { background: linear-gradient(135deg, #0b3b9e, #1d6bf0); color: white; padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #facc15; }
+.brand-wrap { display: flex; align-items: center; gap: 14px; cursor: pointer; }
+.logo-box { background: white; color: #0b3b9e; padding: 6px 14px; font-weight: 800; border-radius: 10px; font-size: 24px; }
+.brand-text .name { font-size: 18px; font-weight: 800; letter-spacing: .3px; }
+.brand-text .tag { font-size: 12px; opacity: .9; margin-top: 2px; }
+.nav-home { color: white; font-weight: 700; cursor: pointer; background: none; border: none; font-size: 15px; }
+
+.container { max-width: 1000px; width: 100%; margin: 0 auto; padding: 30px 20px 50px; flex: 1; }
+
+/* Home */
+.home-title { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+.home-sub { color: #64748b; margin-bottom: 24px; }
+.grid-services { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+.service-card { background: white; padding: 22px; border-radius: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; display: flex; flex-direction: column; gap: 10px; transition: transform .15s, box-shadow .15s; cursor: pointer; }
+.service-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px -5px rgba(30,58,138,0.25); }
+.service-icon { font-size: 34px; }
+.service-title { font-size: 18px; font-weight: 700; color: #1e3a8a; }
+.service-desc { font-size: 14px; color: #475569; flex: 1; }
+.price-badge { background: #f1f5f9; color: #16a34a; font-weight: 700; padding: 4px 12px; border-radius: 20px; display: inline-block; align-self: flex-start; }
+.btn-select { width: 100%; background: #2563eb; color: white; border: none; padding: 11px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; }
+.btn-select:hover { background: #1d4ed8; }
+
+/* Support */
+.support-box { margin-top: 34px; background: white; border: 1px solid #bfdbfe; border-left: 6px solid #2563eb; border-radius: 14px; padding: 22px; }
+.support-title { font-size: 20px; font-weight: 800; color: #1e3a8a; margin-bottom: 6px; }
+.support-box p { color: #475569; margin-bottom: 12px; font-size: 14px; }
+.support-links { display: flex; flex-wrap: wrap; gap: 12px; }
+.support-links a { text-decoration: none; background: #eff6ff; color: #1e3a8a; font-weight: 700; padding: 10px 16px; border-radius: 10px; font-size: 14px; }
+.support-links a:hover { background: #dbeafe; }
+
+/* Service page */
+.back { background: none; border: none; color: #2563eb; font-weight: 700; cursor: pointer; font-size: 15px; margin-bottom: 18px; }
+.service-page { background: white; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08); padding: 32px; }
+.sp-head { display: flex; gap: 16px; align-items: center; margin-bottom: 14px; }
+.sp-head .service-icon { font-size: 44px; }
+.sp-title { font-size: 24px; font-weight: 800; color: #1e3a8a; }
+.sp-desc { color: #475569; margin: 8px 0 14px; line-height: 1.5; }
+.requirements { background: #eff6ff; border-left: 4px solid #2563eb; padding: 14px 18px; border-radius: 8px; margin: 18px 0 8px; font-size: 14px; }
+.requirements b { display: block; margin-bottom: 6px; }
+.requirements ul { padding-left: 20px; line-height: 1.7; }
+.form-title { font-size: 18px; font-weight: 700; margin: 26px 0 4px; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px; }
+.field { grid-column: span 2; }
+.field.half { grid-column: span 1; }
+label { display: block; font-size: 12px; font-weight: 700; color: #475569; margin: 14px 0 6px; text-transform: uppercase; }
+label.inl { display: inline; margin: 0 0 0 4px; }
+input[type=text], input[type=tel], input[type=email], input[type=date], select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; font-size: 14px; }
+textarea { min-height: 80px; resize: vertical; }
+.radios { display: flex; gap: 22px; font-size: 13px; font-weight: 600; padding: 6px 0; }
+.btn-submit { width: 100%; margin-top: 24px; background: #16a34a; color: white; border: none; padding: 14px; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; }
+.btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
+#msg { margin-top: 14px; padding: 12px; border-radius: 8px; font-size: 14px; display: none; }
+#msg.err { display: block; background: #fee2e2; color: #991b1b; }
+
+/* Success dashboard */
+.ok-wrap { text-align: center; }
+.ok-circle { width: 120px; height: 120px; border-radius: 50%; border: 6px solid #16a34a; color: #16a34a; font-size: 64px; display: flex; align-items: center; justify-content: center; margin: 10px auto 24px; font-weight: 800; }
+.ok-title { font-size: clamp(24px, 4.5vw, 40px); font-weight: 800; color: #0b3b9e; line-height: 1.25; }
+.ok-text { color: #1e3a8a; font-size: 18px; line-height: 1.6; margin: 18px auto 26px; max-width: 700px; }
+.receipt { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 18px 22px; display: flex; align-items: center; gap: 18px; text-align: left; margin-bottom: 26px; }
+.receipt .ico { background: #16a34a; color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+.receipt .r1 { color: #15803d; font-weight: 800; font-size: 17px; }
+.receipt .r2 { color: #166534; font-size: 14px; margin-top: 4px; }
+.details { border: 1px solid #dbeafe; border-radius: 12px; overflow: hidden; text-align: left; background: white; }
+.d-row { display: grid; grid-template-columns: 220px 1fr; border-bottom: 1px solid #dbeafe; }
+.d-row:last-child { border-bottom: none; }
+.d-label { background: #f1f6ff; color: #0b3b9e; font-weight: 800; padding: 18px 20px; }
+.d-value { padding: 18px 20px; color: #1e3a8a; }
+.status-pill { background: #dcfce7; color: #15803d; font-weight: 800; padding: 6px 16px; border-radius: 20px; display: inline-block; }
+.ok-actions { display: flex; flex-wrap: wrap; gap: 18px; align-items: center; justify-content: center; margin-top: 30px; }
+.btn-dash { background: #0b57e3; color: white; border: none; padding: 16px 34px; border-radius: 10px; font-weight: 800; font-size: 16px; cursor: pointer; }
+.btn-support { background: none; border: none; color: #0b57e3; font-weight: 800; font-size: 16px; cursor: pointer; }
+
+/* Library (ibizamini) */
+.free-badge { background: #dcfce7; color: #15803d; font-weight: 800; padding: 4px 12px; border-radius: 20px; display: inline-block; align-self: flex-start; }
+.lib-note { background: #fffbeb; border-left: 4px solid #f59e0b; padding: 14px 18px; border-radius: 8px; margin: 18px 0 8px; font-size: 14px; color: #78350f; line-height: 1.6; }
+.lib-group { margin-top: 28px; }
+.lib-group h3 { font-size: 18px; color: #1e3a8a; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #dbeafe; }
+.lib-item { display: flex; gap: 14px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px 18px; margin-bottom: 10px; }
+.lib-item .li-title { font-weight: 700; color: #1e293b; }
+.lib-item .li-info { font-size: 13px; color: #64748b; margin-top: 3px; }
+.lib-actions { display: flex; gap: 10px; }
+.lib-actions button { border: none; cursor: pointer; font-weight: 700; font-size: 14px; padding: 10px 20px; border-radius: 8px; }
+.lib-read { background: #2563eb; color: white; }
+.lib-read:hover { background: #1d4ed8; }
+
+/* Isomero (reader) */
+#reader { position: fixed; inset: 0; background: #0f172a; z-index: 1000; overflow-y: auto; -webkit-user-select: none; user-select: none; overflow-x: auto; }
+.rd-bar { position: sticky; top: 0; z-index: 2; background: #0b3b9e; color: white; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 18px; border-bottom: 3px solid #facc15; }
+.rd-title { font-weight: 800; font-size: 15px; line-height: 1.3; }
+.rd-close { background: white; color: #0b3b9e; border: none; font-weight: 800; padding: 9px 16px; border-radius: 8px; cursor: pointer; flex-shrink: 0; }
+.rd-status { color: #cbd5e1; text-align: center; padding: 14px; font-size: 14px; }
+.rd-status.err { color: #fecaca; font-size: 16px; line-height: 1.6; }
+.rd-pages { padding: 0 0 40px; }
+.rd-zoom { display: flex; align-items: center; gap: 8px; margin-left: auto; margin-right: 6px; }
+.rd-zoom button { background: rgba(255,255,255,.18); color: white; border: none; width: 34px; height: 34px; border-radius: 8px; font-size: 20px; font-weight: 800; cursor: pointer; }
+.rd-zoom button:disabled { opacity: .35; cursor: default; }
+.rd-zoom span { font-size: 13px; font-weight: 700; min-width: 44px; text-align: center; }
+.rd-page { background: white; margin-bottom: 14px; border-radius: 4px; position: relative; overflow: hidden; }
+.rd-page canvas { display: block; width: 100%; height: auto; pointer-events: none; }
+.rd-no { position: absolute; right: 8px; bottom: 6px; background: rgba(15,23,42,.7); color: white; font-size: 12px; padding: 2px 8px; border-radius: 10px; }
+@media print { body { display: none !important; } }
+.thanks-box { margin-top: 32px; background: #ecfdf5; border: 1px solid #a7f3d0; border-left: 6px solid #16a34a; border-radius: 14px; padding: 22px; }
+.thanks-box h3 { color: #15803d; font-size: 19px; margin-bottom: 8px; }
+.thanks-box p { color: #166534; line-height: 1.6; margin-bottom: 14px; font-size: 15px; }
+.thanks-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.thanks-actions a { text-decoration: none; font-weight: 700; padding: 10px 18px; border-radius: 10px; font-size: 14px; }
+.btn-wa { background: #16a34a; color: white; }
+.btn-call { background: #eff6ff; color: #1e3a8a; }
+
+/* Footer */
+footer { background: #eff6ff; border-top: 3px solid #facc15; padding: 22px 40px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between; align-items: center; }
+footer .logo-box { background: #0b3b9e; color: white; font-size: 18px; padding: 4px 10px; }
+.f-left { display: flex; align-items: center; gap: 12px; color: #0b3b9e; }
+.f-left .t1 { font-weight: 800; font-size: 14px; }
+.f-left .t2 { font-size: 12px; }
+.f-right { color: #0b3b9e; font-size: 13px; text-align: right; }
+
+@media (max-width: 640px) {
+  header { padding: 12px 16px; }
+  .brand-text .name { font-size: 14px; }
+  .brand-text .tag { display: none; }
+  .service-page { padding: 20px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .field, .field.half { grid-column: span 1; }
+  .d-row { grid-template-columns: 1fr; }
+  .d-label { padding: 10px 16px; }
+  .d-value { padding: 10px 16px 14px; }
+  footer { padding: 18px 16px; }
+  .f-right { text-align: left; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand-wrap" id="brand">
+    <div class="logo-box">WOS</div>
+    <div class="brand-text">
+      <div class="name">WELLIG ONLINE SERVICES (WOS)</div>
+      <div class="tag">Information &bull; Opportunity &bull; Growth</div>
+    </div>
+  </div>
+  <button class="nav-home" id="navHome" type="button">🏠 Home</button>
+</header>
+
+<div class="container">
+
+  <!-- DASHBOARD Y'IBANZE -->
+  <div id="homeView">
+    <h1 class="home-title">Serivisi Ziboneka</h1>
+    <p class="home-sub">Hitamo serivisi ushaka, hanyuma wuzuze fomu yayo.</p>
+    <div class="grid-services" id="serviceGrid"></div>
+    <div id="homeSupport"></div>
+  </div>
+
+  <!-- URUPAPURO RWA SERIVISI -->
+  <div id="serviceView" class="hidden">
+    <button class="back" id="backBtn" type="button">&larr; Garuka ku serivisi zose</button>
+    <div class="service-page">
+      <div class="sp-head">
+        <div class="service-icon" id="spIcon"></div>
+        <div>
+          <div class="sp-title" id="spTitle"></div>
+          <span class="price-badge" id="spPrice"></span>
+        </div>
+      </div>
+      <p class="sp-desc" id="spDesc"></p>
+      <div class="requirements">
+        <b>Ibyo ukenera / Ibisabwa:</b>
+        <ul id="spReq"></ul>
+      </div>
+
+      <div class="form-title">Uzuza amakuru yawe</div>
+      <form id="appForm" novalidate>
+        <div class="form-grid" id="formFields"></div>
+        <button type="submit" class="btn-submit" id="submitBtn">Ohereza Application</button>
+        <div id="msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <!-- URUPAPURO RW'IBIZAMINI (serivisi itishyuzwa) -->
+  <div id="libraryView" class="hidden">
+    <button class="back" id="libBackBtn" type="button">&larr; Garuka ku serivisi zose</button>
+    <div class="service-page">
+      <div class="sp-head">
+        <div class="service-icon" id="libIcon"></div>
+        <div>
+          <div class="sp-title" id="libTitle"></div>
+          <span class="free-badge">Ni ubuntu (FREE)</span>
+        </div>
+      </div>
+      <p class="sp-desc" id="libDesc"></p>
+      <div class="lib-note" id="libNote"></div>
+      <div id="libGroups"></div>
+
+      <div class="thanks-box">
+        <h3>🙏 Warangije kwiga?</h3>
+        <p>Niba <b>WELLIG ONLINE SERVICES (WOS)</b> yagufashije, dusangize inshuti zawe zitegura ibizamini, kandi utubwire uko byakugendekeye. Intsinzi yawe ni yo ntego yacu.</p>
+        <div class="thanks-actions" id="thanksActions"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD YO GUSHIMIRA (nyuma yo kohereza) -->
+  <div id="successView" class="hidden ok-wrap">
+    <div class="ok-circle">&#10003;</div>
+    <h1 class="ok-title">APPLICATION SUBMITTED TO<br>WELLIG ONLINE SERVICES (WOS)</h1>
+    <p class="ok-text">Thank you. We have successfully received your application.<br>Our team will review the information you submitted.</p>
+
+    <div class="receipt">
+      <div class="ico">&#9993;</div>
+      <div>
+        <div class="r1" id="rcpt1">Sending your confirmation...</div>
+        <div class="r2" id="rcpt2">Please wait a moment.</div>
+      </div>
+    </div>
+
+    <div class="details">
+      <div class="d-row"><div class="d-label">👤 Applicant:</div><div class="d-value" id="okName"></div></div>
+      <div class="d-row"><div class="d-label">📄 Service Selected:</div><div class="d-value" id="okService"></div></div>
+      <div class="d-row"><div class="d-label">🔖 Reference No.:</div><div class="d-value" id="okRef"></div></div>
+      <div class="d-row"><div class="d-label">✅ Submission Status:</div><div class="d-value"><span class="status-pill">Received</span></div></div>
+      <div class="d-row"><div class="d-label">📅 Submission Date:</div><div class="d-value" id="okDate"></div></div>
+    </div>
+
+    <div class="ok-actions">
+      <button class="btn-dash" id="okDash" type="button">🏠 Back to Dashboard</button>
+      <button class="btn-support" id="okSupportBtn" type="button">🎧 Contact WOS Support</button>
+    </div>
+    <div id="okSupport" class="hidden" style="text-align:left;"></div>
+  </div>
+
+</div>
+
+<!-- ISOMERO RY'IBIZAMINI (gusoma gusa, nta gumanura) -->
+<div id="reader" class="hidden">
+  <div class="rd-bar">
+    <div class="rd-title" id="rdTitle"></div>
+    <div class="rd-zoom">
+      <button type="button" id="rdZoomOut" aria-label="Gabanya">&minus;</button>
+      <span id="rdZoomLabel">100%</span>
+      <button type="button" id="rdZoomIn" aria-label="Zamura">+</button>
+    </div>
+    <button type="button" class="rd-close" id="rdClose">✕ Funga</button>
+  </div>
+  <div class="rd-status" id="rdStatus"></div>
+  <div class="rd-pages" id="rdPages"></div>
+</div>
+
+<footer>
+  <div class="f-left">
+    <div class="logo-box">WOS</div>
+    <div>
+      <div class="t1">WELLIG ONLINE SERVICES (WOS)</div>
+      <div class="t2">Information &bull; Opportunity &bull; Growth</div>
+    </div>
+  </div>
+  <div class="f-right">
+    📍 Busoro Sector, Nyanza District<br>Southern Province - Rwanda
+  </div>
+</footer>
+
+<script>
+  // ====== AMAKURU YA SUPABASE ======
+  const SUPABASE_URL = "https://bfrbeigolfkielcabkop.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmcmJlaWdvbGZraWVsY2Fia29wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI0MDkwMDgsImV4cCI6MjEwNzk4NTAwOH0.Htye6_oRlsnfAK_uAE3x7pu8I1lGz0Q7495PsRK1pek";
+
+  let sb = null;
+  try {
+    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } catch (err) {
+    console.error("Supabase ntiyashoboye gufungurwa:", err);
+  }
+
+  // ====== WOS SUPPORT ======
+  const SUPPORT = {
+    phones: ["0794055078", "0732156033"],
+    email: "niyonzimawellig@gmail.com"
+  };
+
+  function fmtPhone(p) { return p.slice(0, 4) + " " + p.slice(4, 7) + " " + p.slice(7); }
+
+  function supportHTML() {
+    return '<div class="support-box">' +
+      '<div class="support-title">🎧 WOS Support</div>' +
+      '<p>Ukeneye ubufasha cyangwa ufite ikibazo? Twandikire cyangwa uduhamagare:</p>' +
+      '<div class="support-links">' +
+      SUPPORT.phones.map(p => '<a href="tel:' + p + '">📞 ' + fmtPhone(p) + '</a>').join("") +
+      '<a href="mailto:' + SUPPORT.email + '">✉️ ' + SUPPORT.email + '</a>' +
+      '</div></div>';
+  }
+
+  // =====================================================================
+  //  URUTONDE RW'SERIVISI
+  //  Kongeramo serivisi nshya: kopa imwe ("{ id: ... }") ukayihindura.
+  //  Ubwoko bwa field: text, tel, email, date, radio, select, textarea
+  //  half: true => igice cy'umurongo | required: true => ni ngombwa
+  // =====================================================================
+  const SERVICES = [
+    {
+      id: "hec_rp",
+      icon: "🏦",
+      name: "HEC Student Loan (RP)",
+      price: 2000,
+      short: "Gusaba inguzanyo muri HEC kubera RP",
+      desc: "Tugufasha kuzuza no kohereza application yo kwaka inguzanyo yo kwiga muri HEC ku bantu bakoze application muri Rwanda Polytechnic (RP).",
+      requirements: [
+        "Amazina yombi n'indangamuntu",
+        "Nimero za telefoni 2 zikora",
+        "REG number na RP College ushaka kwigamo",
+        "Amazina y'ababyeyi (Papa na Mama)",
+        "Ahitamo utuyemo (Akarere, Umurenge, Akagari, Umudugudu)"
+      ],
+      fields: [
+        { key: "full_name", label: "1. Amazina yombi", type: "text", placeholder: "Urugero: Keza Alice", required: true },
+        { key: "phone", label: "2. Nimero ya telephone", type: "tel", placeholder: "07xxxxxxxx", required: true, half: true },
+        { key: "second_phone", label: "3. Indi nimero ya telephone", type: "tel", placeholder: "07xxxxxxxx", required: true, half: true },
+        { key: "reg_number", label: "4. REG number", type: "text", placeholder: "Urugero: RP2026...", required: true, half: true },
+        { key: "national_id", label: "5. Nimero y'irangamuntu", type: "text", placeholder: "16 imibare", required: true, half: true },
+        { key: "father_name", label: "6. Amazina ya papa we", type: "text", required: true, half: true },
+        { key: "mother_name", label: "7. Amazina ya mama we", type: "text", required: true, half: true },
+        { key: "district", label: "8. Akarere", type: "text", required: true, half: true },
+        { key: "sector", label: "9. Umurenge", type: "text", required: true, half: true },
+        { key: "sector_2", label: "10. Umurenge (indi)", type: "text", half: true },
+        { key: "cell", label: "11. Akagari", type: "text", required: true, half: true },
+        { key: "village", label: "12. Umudugudu", type: "text", required: true, half: true },
+        { key: "rp_college", label: "13. RP college ashaka kwigamo", type: "text", placeholder: "Urugero: IPRC Kigali, IPRC Huye, ...", required: true }
+      ]
+    },
+    {
+      id: "ur",
+      icon: "🎓",
+      name: "University of Rwanda (UR)",
+      price: 3000,
+      short: "Kuzuza application muri UR undergraduate",
+      desc: "Tugufasha kuzuza application yawe yo kwiga muri University of Rwanda (undergraduate) tukayohereza neza kandi ku gihe.",
+      requirements: [
+        "Indangamuntu cyangwa nimero y'indangamuntu",
+        "Nimero y'ibizamini bya Leta (Senior 6 index number)",
+        "Amanota cyangwa icyiciro (combination) wize",
+        "Nimero ya telefoni na email bikora"
+      ],
+      fields: [
+        { key: "full_name", label: "Amazina yose (Full name)", type: "text", placeholder: "Urugero: Keza Alice", required: true },
+        { key: "phone", label: "Telefoni (MoMo)", type: "tel", placeholder: "07xxxxxxxx", required: true, half: true },
+        { key: "email", label: "Email", type: "email", placeholder: "urugero@gmail.com", required: true, half: true },
+        { key: "dob", label: "Itariki y'amavuko", type: "date", half: true },
+        { key: "gender", label: "Igitsina", type: "radio", options: ["Gabo", "Gore"], half: true },
+        { key: "national_id", label: "Nimero y'indangamuntu", type: "text", placeholder: "16 imibare", half: true },
+        { key: "index_number", label: "Senior 6 index number", type: "text", half: true },
+        { key: "school", label: "Ishuri wizeho (Senior 6)", type: "text", half: true },
+        { key: "combination", label: "Icyiciro wize (Combination)", type: "text", placeholder: "Urugero: PCB, MCB, HEG", half: true },
+        { key: "program_choice", label: "Porogaramu ushaka kwiga (1)", type: "text", half: true },
+        { key: "program_choice2", label: "Porogaramu ya kabiri (niba ihari)", type: "text", half: true },
+        { key: "district", label: "Akarere", type: "text", half: true },
+        { key: "sector", label: "Umurenge", type: "text", half: true }
+      ]
+    },
+    {
+      id: "mifotra",
+      icon: "💼",
+      name: "MIFOTRA E-Recruitment",
+      price: 3000,
+      short: "Gukora application z'akazi za Leta",
+      desc: "Tugufasha gusaba akazi ka Leta kuri e-recruitment ya MIFOTRA, tukuzuriza CV na dosiye zose zikenewe.",
+      requirements: [
+        "Indangamuntu",
+        "Impamyabumenyi (diploma / degree) mu buryo bwa PDF",
+        "CV n'ibaruwa isaba akazi",
+        "Nimero y'akazi cyangwa izina ry'umwanya usaba"
+      ],
+      fields: [
+        { key: "full_name", label: "Amazina yose (Full name)", type: "text", placeholder: "Urugero: Keza Alice", required: true },
+        { key: "phone", label: "Telefoni (MoMo)", type: "tel", placeholder: "07xxxxxxxx", required: true, half: true },
+        { key: "email", label: "Email", type: "email", placeholder: "urugero@gmail.com", required: true, half: true },
+        { key: "dob", label: "Itariki y'amavuko", type: "date", half: true },
+        { key: "gender", label: "Igitsina", type: "radio", options: ["Gabo", "Gore"], half: true },
+        { key: "national_id", label: "Nimero y'indangamuntu", type: "text", half: true, required: true },
+        { key: "qualification", label: "Impamyabumenyi ufite", type: "select", options: ["A2", "A1 / Diploma", "Bachelor's (Degree)", "Master's", "Indi"], half: true },
+        { key: "field_of_study", label: "Ibyo wize (Field of study)", type: "text", half: true },
+        { key: "experience_years", label: "Imyaka y'uburambe", type: "text", placeholder: "Urugero: 2", half: true },
+        { key: "job_position", label: "Umwanya usaba (Job position)", type: "text", required: true },
+        { key: "institution", label: "Ikigo / Akarere akazi gaherereyemo", type: "text", half: true },
+        { key: "district", label: "Akarere utuyemo", type: "text", half: true },
+        { key: "notes", label: "Andi makuru ushaka kutubwira", type: "textarea" }
+      ]
+    },
+    {
+      id: "rra",
+      icon: "🧾",
+      name: "RRA / TIN Number",
+      price: 1000,
+      short: "Gusaba TIN number na serivisi za RRA",
+      desc: "Tugufasha gusaba TIN number no gukoresha izindi serivisi za RRA (Rwanda Revenue Authority) byihuse.",
+      requirements: [
+        "Indangamuntu (cyangwa pasiporo ku munyamahanga)",
+        "Nimero ya telefoni ikora",
+        "Ku bacuruzi: izina n'aho ubucuruzi bukorera"
+      ],
+      fields: [
+        { key: "full_name", label: "Amazina yose (Full name)", type: "text", placeholder: "Urugero: Keza Alice", required: true },
+        { key: "phone", label: "Telefoni (MoMo)", type: "tel", placeholder: "07xxxxxxxx", required: true, half: true },
+        { key: "email", label: "Email", type: "email", placeholder: "urugero@gmail.com", required: true, half: true },
+        { key: "dob", label: "Itariki y'amavuko", type: "date", half: true },
+        { key: "gender", label: "Igitsina", type: "radio", options: ["Gabo", "Gore"], half: true },
+        { key: "national_id", label: "Nimero y'indangamuntu", type: "text", half: true, required: true },
+        { key: "taxpayer_type", label: "Ubwoko bw'usaba", type: "select", options: ["Umuntu ku giti cye (Individual)", "Ubucuruzi (Business)"], half: true },
+        { key: "business_name", label: "Izina ry'ubucuruzi (niba bihari)", type: "text" },
+        { key: "district", label: "Akarere", type: "text", half: true },
+        { key: "sector", label: "Umurenge", type: "text", half: true },
+        { key: "cell", label: "Akagari", type: "text", half: true },
+        { key: "village", label: "Umudugudu", type: "text", half: true }
+      ]
+    },
+    {
+      // ===== SERIVISI ITISHYUZWA: IBIZAMINI BYAKOZWE =====
+      id: "ibizamini",
+      type: "library",
+      free: true,
+      icon: "📚",
+      name: "Ibizamini byakozwe (ES & SEDO/EHCDO)",
+      short: "Iga ibizamini by'imyaka ishize by'Umunyamabanga Nshingwabikorwa (ES) n'Ushinzwe Iterambere (SEDO/EHCDO). Ni ubuntu!",
+      desc: "Hano ushobora gusoma ibizamini byakozwe mu myaka yashize mu gutanga akazi ka ES na SEDO/EHCDO ku rwego rw'Akagari n'Akarere. Kanda ku kizamini usome ku rubuga; igihe ushaka kongera gusoma, garuka kuri WOS.",
+      note: "⚠️ <b>Icyitonderwa:</b> Ibisubizo biri mu bizamini bimwe (amashusho yo kuri portal ya MIFOTRA) byatoranyijwe n'abakandida bakoze ibyo bizamini, ntibiba byanze bikunze ari ukuri. Genzura buri gisubizo mu mategeko n'inyandiko za Leta. Ibibazo n'amategeko bihora bihinduka, bityo ibizamini bya kera bishobora kuba bitagikurikizwa.",
+      groups: [
+        {
+          title: "Executive Secretary (ES)",
+          items: [
+            { title: "ES w'Akagari - Nyagatare", file: "Cell_ES_Nyagatare.pdf", info: "Impapuro 52 • Amashusho y'ikizamini kuri portal ya MIFOTRA" },
+            { title: "ES - Umujyi wa Kigali", file: "ES_KIGALI_EXAM.pdf", info: "Impapuro 53 • Ibibazo 50 kuri portal ya MIFOTRA" },
+            { title: "ES - Nyaruguru", file: "EX_OF_ES_NYARUGURU.pdf", info: "Impapuro 8 • Ibibazo n'amahitamo (Icyongereza)" },
+            { title: "Executive Secretary Exam", file: "EXECUTIVE_SECRETARY_EXAM_071518.pdf", info: "Impapuro 10 • Ibibazo n'amahitamo (Icyongereza)" }
+          ]
+        },
+        {
+          title: "SEDO / EHCDO (Ushinzwe Iterambere ry'Ubukungu n'Abaturage)",
+          items: [
+            { title: "SEDO - Nyamagabe 2024 (hamwe n'ibisubizo)", file: "2024_SEDO_Nyamagabe_with_Answers-1.pdf", info: "Impapuro 28 • Hari ibibazo byo kwandika n'ibyo guhitamo" },
+            { title: "EHCDO - Ikizamini cyo hambere", file: "EHCDO_PAST_EXAM.pdf", info: "Impapuro 25 • Economic and Human Capital Development Officer" },
+            { title: "SEDO - Kigali (Human Capital)", file: "Humana_capital_Sedo_Kigali-1.pdf", info: "Impapuro 52 • Amashusho y'ikizamini kuri portal ya MIFOTRA" }
+          ]
+        },
+        {
+          title: "Ibyo kwiga byunganira (Study materials)",
+          items: [
+            { title: "NST2 2024-2029 (Gahunda ya Kabiri y'Igihugu yo Kwihutisha Iterambere)", file: "NST2_Abridged_Version__Kinyarwanda_.pdf", info: "Impapuro 68 • Kinyarwanda • Inyandiko ihinnye" },
+            { title: "Itegeko rigenga imikorere y'Akarere (N° 08/2006)", file: "SEDO_AND_GITIFDistrict_Law.pdf", info: "Impapuro 53 • Icyongereza • Itegeko ryo mu 2006, reba ko ritasimbuwe n'irishya" }
+          ]
+        }
+      ]
+    }
+  ];
+
+  const EXAMS_BASE = "exams/";
+
+  const DB_COLUMNS = [
+    "full_name", "phone", "email", "dob", "gender", "district", "sector", "cell", "village",
+    "national_id", "index_number", "school", "combination", "program_choice", "program_choice2",
+    "qualification", "field_of_study", "experience_years", "job_position", "institution", "notes",
+    "taxpayer_type", "business_name"
+  ];
+
+  const homeView = document.getElementById("homeView");
+  const serviceView = document.getElementById("serviceView");
+  const successView = document.getElementById("successView");
+  const libraryView = document.getElementById("libraryView");
+  let currentService = null;
+  let showingSuccess = false;
+
+  document.getElementById("homeSupport").innerHTML = supportHTML();
+  document.getElementById("okSupport").innerHTML = supportHTML();
+
+  function renderHome() {
+    const grid = document.getElementById("serviceGrid");
+    grid.innerHTML = "";
+    SERVICES.forEach(s => {
+      const card = document.createElement("div");
+      card.className = "service-card";
+      card.innerHTML =
+        '<div class="service-icon">' + s.icon + '</div>' +
+        '<div class="service-title">' + s.name + '</div>' +
+        '<div class="service-desc">' + s.short + '</div>' +
+        (s.free
+          ? '<div class="free-badge">Ni ubuntu (FREE)</div>'
+          : '<div class="price-badge">' + s.price.toLocaleString() + ' RWF</div>') +
+        '<button type="button" class="btn-select">Fungura</button>';
+      card.addEventListener("click", () => { location.hash = "#/" + s.id; });
+      grid.appendChild(card);
+    });
+  }
+
+  function fieldHTML(f) {
+    const req = f.required ? " *" : "";
+    let input = "";
+    if (f.type === "radio") {
+      input = '<div class="radios">' + f.options.map((o, i) =>
+        '<span><input type="radio" name="' + f.key + '" id="f_' + f.key + '_' + i + '" value="' + o + '">' +
+        '<label class="inl" for="f_' + f.key + '_' + i + '">' + o + '</label></span>').join("") + '</div>';
+    } else if (f.type === "select") {
+      input = '<select id="f_' + f.key + '"><option value="">-- Hitamo --</option>' +
+        f.options.map(o => '<option value="' + o + '">' + o + '</option>').join("") + '</select>';
+    } else if (f.type === "textarea") {
+      input = '<textarea id="f_' + f.key + '" placeholder="' + (f.placeholder || "") + '"></textarea>';
+    } else {
+      input = '<input type="' + f.type + '" id="f_' + f.key + '" placeholder="' + (f.placeholder || "") + '">';
+    }
+    return '<div class="field' + (f.half ? " half" : "") + '"><label>' + f.label + req + '</label>' + input + '</div>';
+  }
+
+  function hideAll() {
+    homeView.classList.add("hidden");
+    serviceView.classList.add("hidden");
+    successView.classList.add("hidden");
+    libraryView.classList.add("hidden");
+  }
+
+  function escHTML(t) {
+    return String(t).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  }
+
+  function openLibrary(s) {
+    currentService = s;
+    document.getElementById("libIcon").textContent = s.icon;
+    document.getElementById("libTitle").textContent = s.name;
+    document.getElementById("libDesc").textContent = s.desc;
+    document.getElementById("libNote").innerHTML = s.note;
+
+    document.getElementById("libGroups").innerHTML = s.groups.map(g =>
+      '<div class="lib-group"><h3>' + escHTML(g.title) + '</h3>' +
+      g.items.map(it => {
+        return '<div class="lib-item"><div>' +
+          '<div class="li-title">' + escHTML(it.title) + '</div>' +
+          '<div class="li-info">' + escHTML(it.info) + '</div></div>' +
+          '<div class="lib-actions">' +
+          '<button type="button" class="lib-read" data-file="' + escHTML(it.file) + '" data-title="' + escHTML(it.title) + '">📖 Soma</button>' +
+          '</div></div>';
+      }).join("") + '</div>'
+    ).join("");
+
+    const shareText = encodeURIComponent(
+      "Wellig Online Services (WOS): iga ibizamini byakozwe bya ES na SEDO ku buntu! " + location.origin
+    );
+    document.getElementById("thanksActions").innerHTML =
+      '<a class="btn-wa" href="https://wa.me/?text=' + shareText + '" target="_blank" rel="noopener">📲 Dusangize kuri WhatsApp</a>' +
+      '<a class="btn-call" href="tel:' + SUPPORT.phones[0] + '">📞 Tubwire uko byagenze: ' + fmtPhone(SUPPORT.phones[0]) + '</a>' +
+      '<a class="btn-call" href="mailto:' + SUPPORT.email + '">✉️ Twandikire</a>';
+
+    hideAll();
+    libraryView.classList.remove("hidden");
+    window.scrollTo(0, 0);
+  }
+
+  const PDFJS_WORKER = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.7.107/pdf.worker.min.js";
+  const reader = document.getElementById("reader");
+  const rdPages = document.getElementById("rdPages");
+  const rdStatus = document.getElementById("rdStatus");
+  const ZOOMS = [1, 1.25, 1.5, 2, 2.5, 3];
+  let rdZoomIdx = 0;
+  let rdObserver = null;
+  let rdToken = 0;
+  let rdPdf = null;
+  let rdRatio = 1.3;
+  let rdState = {};
+
+  function rdMessage(text, isErr) {
+    rdStatus.textContent = text;
+    rdStatus.className = "rd-status" + (isErr ? " err" : "");
+  }
+
+  function rdBaseWidth() { return Math.max(280, Math.min(window.innerWidth - 20, 1000)); }
+  function rdWidth() { return Math.round(rdBaseWidth() * ZOOMS[rdZoomIdx]); }
+
+  function rdLayout() {
+    const w = rdWidth();
+    rdPages.style.width = w + "px";
+    rdPages.style.margin = (w + 20 <= window.innerWidth) ? "0 auto" : "0";
+    document.getElementById("rdZoomLabel").textContent = Math.round(ZOOMS[rdZoomIdx] * 100) + "%";
+    document.getElementById("rdZoomOut").disabled = rdZoomIdx === 0;
+    document.getElementById("rdZoomIn").disabled = rdZoomIdx === ZOOMS.length - 1;
+  }
+
+  function closeReader() {
+    rdToken++;
+    rdPdf = null;
+    reader.classList.add("hidden");
+    document.body.style.overflow = "";
+    rdPages.innerHTML = "";
+    if (rdObserver) { rdObserver.disconnect(); rdObserver = null; }
+  }
+
+  async function loadPdfDoc(file) {
+    const enc = encodeURIComponent(file);
+    const paths = [EXAMS_BASE + enc, enc];
+    let lastErr = null;
+    for (const p of paths) {
+      try { return await pdfjsLib.getDocument({ url: p }).promise; } catch (e) { lastErr = e; }
+    }
+    throw lastErr;
+  }
+
+  async function rdRender(h) {
+    const n = Number(h.dataset.n);
+    if (rdState[n]) return;
+    rdState[n] = 1;
+    const token = rdToken, pdf = rdPdf, zi = rdZoomIdx;
+    try {
+      const page = await pdf.getPage(n);
+      if (token !== rdToken || zi !== rdZoomIdx) return;
+      const base = page.getViewport({ scale: 1 });
+      const cssW = rdPages.clientWidth || rdWidth();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const targetW = Math.min(Math.max(cssW * dpr * 1.5, 1900), 3600);
+      let scale = targetW / base.width;
+      const MAXPX = 12e6;
+      if (base.width * scale * base.height * scale > MAXPX) scale = Math.sqrt(MAXPX / (base.width * base.height));
+      const vp = page.getViewport({ scale });
+      const canvas = document.createElement("canvas");
+      canvas.width = Math.floor(vp.width);
+      canvas.height = Math.floor(vp.height);
+      await page.render({ canvasContext: canvas.getContext("2d"), viewport: vp }).promise;
+      if (token !== rdToken || zi !== rdZoomIdx) return;
+      h.innerHTML = "";
+      h.appendChild(canvas);
+      h.style.minHeight = "";
+      const no = document.createElement("div");
+      no.className = "rd-no";
+      no.textContent = n + " / " + pdf.numPages;
+      h.appendChild(no);
+      rdState[n] = 2;
+    } catch (e) {
+      console.error("Urupapuro " + n + " ntirushoboye gushushanywa", e);
+      rdState[n] = 0;
+    }
+  }
+
+  function rdUnload(h) {
+    const n = Number(h.dataset.n);
+    if (rdState[n] !== 2) return;
+    h.style.minHeight = h.offsetHeight + "px";
+    h.innerHTML = "";
+    rdState[n] = 0;
+  }
+
+  function rdObserve() {
+    if (rdObserver) rdObserver.disconnect();
+    rdObserver = new IntersectionObserver(entries => {
+      entries.forEach(en => { if (en.isIntersecting) rdRender(en.target); else rdUnload(en.target); });
+    }, { root: reader, rootMargin: "900px 0px" });
+    rdPages.querySelectorAll(".rd-page").forEach(h => rdObserver.observe(h));
+  }
+
+  function rdBuildHolders() {
+    rdPages.innerHTML = "";
+    rdState = {};
+    const minH = Math.round(rdWidth() * rdRatio) + "px";
+    for (let i = 1; i <= rdPdf.numPages; i++) {
+      const h = document.createElement("div");
+      h.className = "rd-page";
+      h.dataset.n = i;
+      h.style.minHeight = minH;
+      rdPages.appendChild(h);
+    }
+    rdObserve();
+  }
+
+  function rdSetZoom(idx) {
+    if (!rdPdf) return;
+    idx = Math.max(0, Math.min(ZOOMS.length - 1, idx));
+    if (idx === rdZoomIdx) return;
+    const frac = reader.scrollTop / Math.max(1, reader.scrollHeight);
+    rdZoomIdx = idx;
+    rdLayout();
+    rdBuildHolders();
+    reader.scrollTop = frac * reader.scrollHeight;
+  }
+
+  async function openReader(title, file) {
+    const token = ++rdToken;
+    rdPdf = null;
+    rdZoomIdx = 0;
+    document.getElementById("rdTitle").textContent = title;
+    rdPages.innerHTML = "";
+    if (rdObserver) { rdObserver.disconnect(); rdObserver = null; }
+    rdLayout();
+    rdMessage("Birimo gufungurwa...", false);
+    reader.classList.remove("hidden");
+    reader.scrollTop = 0;
+    document.body.style.overflow = "hidden";
+
+    if (typeof pdfjsLib === "undefined") {
+      rdMessage("Ntibishoboye gufungura isomero. Reba internet yawe, ongere ugerageze.", true);
+      return;
+    }
+    pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKER;
+
+    let pdf;
+    try {
+      pdf = await loadPdfDoc(file);
+    } catch (e) {
+      console.error("PDF ntiyabonetse:", file, e);
+      if (token !== rdToken) return;
+      rdMessage("Ikizamini ntikiraboneka ubu. Twandikire kuri WOS Support tukigufashe.", true);
+      return;
+    }
+    if (token !== rdToken) return;
+    rdMessage("Impapuro " + pdf.numPages + " • Kururura hasi usome • Koresha + kugira ngo wongere ubunini bw'inyandiko", false);
+
+    const first = await pdf.getPage(1);
+    if (token !== rdToken) return;
+    const vp1 = first.getViewport({ scale: 1 });
+    rdRatio = vp1.height / vp1.width;
+    rdPdf = pdf;
+    rdLayout();
+    rdBuildHolders();
+  }
+
+  document.getElementById("rdClose").addEventListener("click", closeReader);
+  document.getElementById("rdZoomIn").addEventListener("click", () => rdSetZoom(rdZoomIdx + 1));
+  document.getElementById("rdZoomOut").addEventListener("click", () => rdSetZoom(rdZoomIdx - 1));
+  document.addEventListener("keydown", e => {
+    if (reader.classList.contains("hidden")) return;
+    if (e.key === "Escape") closeReader();
+    else if (e.key === "+" || e.key === "=") rdSetZoom(rdZoomIdx + 1);
+    else if (e.key === "-") rdSetZoom(rdZoomIdx - 1);
+  });
+  reader.addEventListener("contextmenu", e => e.preventDefault());
+  document.getElementById("libGroups").addEventListener("click", e => {
+    const b = e.target.closest(".lib-read");
+    if (b) openReader(b.dataset.title, b.dataset.file);
+  });
+
+  function openService(s) {
+    if (s.type === "library") { openLibrary(s); return; }
+    currentService = s;
+    document.getElementById("spIcon").textContent = s.icon;
+    document.getElementById("spTitle").textContent = s.name;
+    document.getElementById("spPrice").textContent = "Igiciro: " + s.price.toLocaleString() + " RWF";
+    document.getElementById("spDesc").textContent = s.desc;
+    document.getElementById("spReq").innerHTML = s.requirements.map(r => "<li>" + r + "</li>").join("");
+    document.getElementById("formFields").innerHTML = s.fields.map(fieldHTML).join("");
+    const msg = document.getElementById("msg");
+    msg.className = ""; msg.textContent = "";
+    hideAll();
+    serviceView.classList.remove("hidden");
+    window.scrollTo(0, 0);
+  }
+
+  function openHome() {
+    currentService = null;
+    hideAll();
+    homeView.classList.remove("hidden");
+    window.scrollTo(0, 0);
+  }
+
+  function route() {
+    if (showingSuccess) return;
+    const m = location.hash.match(/^#\/(.+)$/);
+    const s = m ? SERVICES.find(x => x.id === m[1]) : null;
+    if (s) openService(s); else openHome();
+  }
+
+  function goHome() {
+    showingSuccess = false;
+    document.getElementById("okSupport").classList.add("hidden");
+    location.hash = "#/";
+    route();
+  }
+
+  window.addEventListener("hashchange", route);
+  document.getElementById("backBtn").addEventListener("click", goHome);
+  document.getElementById("libBackBtn").addEventListener("click", goHome);
+  document.getElementById("brand").addEventListener("click", goHome);
+  document.getElementById("navHome").addEventListener("click", goHome);
+  document.getElementById("okDash").addEventListener("click", goHome);
+  document.getElementById("okSupportBtn").addEventListener("click", () => {
+    const box = document.getElementById("okSupport");
+    box.classList.toggle("hidden");
+    if (!box.classList.contains("hidden")) box.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  function showErr(text) {
+    const m = document.getElementById("msg");
+    m.textContent = text;
+    m.className = "err";
+    m.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+
+  function makeRef() {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const a = new Uint8Array(8);
+    crypto.getRandomValues(a);
+    return "WOS-" + Array.from(a, x => chars[x % chars.length]).join("");
+  }
+
+  function showSuccess(info) {
+    showingSuccess = true;
+    hideAll();
+    document.getElementById("okName").textContent = info.name;
+    document.getElementById("okService").textContent = info.service;
+    document.getElementById("okRef").textContent = info.ref;
+    document.getElementById("okDate").textContent = new Date().toLocaleDateString("en-GB",
+      { day: "numeric", month: "long", year: "numeric", timeZone: "Africa/Kigali" });
+    document.getElementById("rcpt1").textContent = "Sending your confirmation...";
+    document.getElementById("rcpt2").textContent = "Please wait a moment.";
+    successView.classList.remove("hidden");
+    window.scrollTo(0, 0);
+  }
+
+  function applyReceipt(res) {
+    const r1 = document.getElementById("rcpt1");
+    const r2 = document.getElementById("rcpt2");
+    const emailOk = res && res.email === "sent";
+    const smsOk = res && res.sms === "sent";
+    if (emailOk) {
+      r1.textContent = "A confirmation receipt has been sent to your email address.";
+      r2.textContent = "Please check your inbox or spam folder." + (smsOk ? " A confirmation SMS was also sent to your phone." : "");
+    } else if (smsOk) {
+      r1.textContent = "A confirmation SMS has been sent to your phone.";
+      r2.textContent = "Keep your reference number for follow-up.";
+    } else {
+      r1.textContent = "Your application is saved.";
+      r2.textContent = "We could not send the confirmation message right now. Keep your reference number; our team will contact you.";
+    }
+  }
+
+  document.getElementById("appForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const s = currentService;
+    if (!s) return;
+
+    if (!sb) {
+      showErr("Ntibishoboye guhuza na Supabase. Reba internet yawe ongere ugerageze.");
+      return;
+    }
+
+    const values = {};
+    for (const f of s.fields) {
+      let v = "";
+      if (f.type === "radio") {
+        const el = document.querySelector('input[name="' + f.key + '"]:checked');
+        v = el ? el.value : "";
+      } else {
+        v = document.getElementById("f_" + f.key).value.trim();
+      }
+      if (f.required && !v) {
+        showErr("Uzuza: " + f.label);
+        return;
+      }
+      values[f.key] = v;
+    }
+
+    const ref = makeRef();
+    const row = { service_name: s.name, price: String(s.price), reference: ref };
+    const details = {};
+    for (const k in values) {
+      if (DB_COLUMNS.includes(k)) row[k] = values[k];
+      else details[k] = values[k];
+    }
+    row.details = details;
+
+    const btn = document.getElementById("submitBtn");
+    btn.disabled = true;
+    btn.textContent = "Birimo koherezwa...";
+
+    const { error } = await sb.from("applications").insert([row]);
+
+    btn.disabled = false;
+    btn.textContent = "Ohereza Application";
+
+    if (error) {
+      console.error(error);
+      showErr("Habaye ikibazo: " + error.message);
+      return;
+    }
+
+    showSuccess({ name: values.full_name, service: s.name, ref: ref });
+
+    fetch("/api/notify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ reference: ref })
+    })
+      .then(r => r.json())
+      .then(applyReceipt)
+      .catch(() => applyReceipt({}));
+  });
+
+  renderHome();
+  route();
+</script>
+</body>
+</html>
